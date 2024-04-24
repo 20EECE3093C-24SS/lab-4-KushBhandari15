@@ -1,33 +1,31 @@
 name: Doc Generation
+run-name: ${{ github.actor }} - Docs
 on:
   push:
     tags:
-      - 'v*.*.*'
+      - 'v*.*.*'                                       
 jobs:
   build-docs:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v2
-      
+      - uses: actions/checkout@v4
       - name: Setup Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
-      
+          python-version: '3.11'                       
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
-      
+          pip install -r requirements.txt              
       - name: Build HTML documentation
         run: |
           sphinx-apidoc -o docs/source/ sample/
           cd docs
-          make html
-      
-      - name: Archive HTML documentation
-        uses: actions/upload-artifact@v2
+          make html                                    
+          cd build
+          zip ../../api_docs.zip -r html/
+      - name: Upload html documentation
+        uses: actions/upload-artifact@v4
         with:
           name: apidocs
-          path: docs/build/html
+          path: api_docs.zip
